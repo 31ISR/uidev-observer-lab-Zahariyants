@@ -1,87 +1,131 @@
-const slides = document.querySelectorAll(".service-grid, .stats-grid, .testimonials")
-
 const options = {
     threshold: 0.3,
     rootMargin: "0px 0px -80px 0px"
 };
 
-const recipeObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
         if (entry.isIntersecting) {
-            const items = entry.target.querySelectorAll(".stagger-item");
-
-            items.forEach((item, index) => {
-                setTimeout(() => {
-                    item.classList.add("animate");
-                }, index * 200);
-            });
+            entry.target.classList.add('animate');
+            observer.unobserve(entry.target);
         }
     });
 }, options);
 
-animatedCont.foreach((card) => {
-    animateObserver.observe(card);
+const animateElements = document.querySelectorAll('.animate-on-scroll, .slide-left, .slide-right, .scale-up, .fade-in, .stagger-item');
+animateElements.forEach(el => observer.observe(el));
+
+const staggerGroups = document.querySelectorAll('.stats-grid, .testimonials');
+staggerGroups.forEach(group => {
+    const items = group.querySelectorAll('.stagger-item');
+    
+    const staggerObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                items.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('animate');
+                    }, index * 200);
+                });
+                staggerObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    staggerObserver.observe(group);
 });
 
-const scrollIndicator = document.querySelector("scroll-progress");
-window.addEventListener("scroll", () => {
-    const percent = window.scrollY / (document.documentElement.scrollHeight - window.InnerHeight) * 100 + "%";
-    scrollIndicator.style.width = percent
+const scrollProgress = document.querySelector('.scroll-progress');
+
+window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = (scrollTop / docHeight) * 100;
+    
+    scrollProgress.style.width = scrollPercent + '%';
 });
 
-const headbgc = document.querySelector("header");
-window.addEventListener("scroll", () => {
+const header = document.querySelector('header');
+
+window.addEventListener('scroll', () => {
     if (window.scrollY > 100) {
-        headbgc.style.background = "rgba(10, 10, 10, 0.95)";
+        header.style.background = 'rgba(10, 10, 10, 0.95)';
     } else {
-        headbgc.style.background = "rgba(10, 10, 10, 0.9)";
+        header.style.background = 'rgba(10, 10, 10, 0.9)';
     }
 });
 
-const navlinks = document.querySelector(".nav-links a");
-navLinks.forEach((link) => {
-    link.addEventListener("click", (event) => {
-        event.preventDefault();
-        const id = link.getAttribute("href");
-        document.querySelectorAll(id).scrollIntoView({behavior: "smooth", block: "center"});
+document.querySelectorAll('').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault()
+
+        const targetID = this.getAttribute('href');
+        const targetSection = document.querySelector(targetID);
+
+        if (targetSection) {
+            const headerHeight = header.offsetHeight;
+            const elementPosition = targetSection.offsetTop - headerHeight;
+
+            window.scrollTo({
+                top: elementPosition,
+                behavior: 'smooth'
+            });
+        }
     });
 });
 
-for (let i = 0; i < 30; i++) {
-    const flake = document.createElement("div");
-    flake.classList.add("snowflake");
-    flake.style.left = Math.random() * 100 + "%";
-    flake.style.amimationsDelay = Math.random() * 100 + "ms";
-    flake.style.amimationsDuration = Math.random() * 10000 + "ms";
-    container.appendChild(flake);
-}
+const stats = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            const numbers = entry.target.querySelectorAll(".stagger-item");
 
-function countUp(element, target, index, duration = 200) {
-    let current = 0;
-    const step = target / (duration / 16);
-    setInterval(() => {
-        if (current + step < target) {
-            current += step
-            element.innerHTML = Math.round(current)
-        } else {
-            switch (index) {
-                case 0:
-                    element.innerHTML = "1M+"
-                    break;
-
-                case 1:
-                    element.innerHTML = "99.9%"
-                    break;
-
-                default:
-                    element.innerHTML = target
-                    break;
-            }
+            numbers.forEach(number => {
+                const target = parseInt(number.textContent.replace(''));
+                const duration = 2000;
+                let current = 0;
+                const step = target / (duration / 16);
+                const counter = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        number.textContent = number.textContent.replace('href').replace(target);
+                        clearInterval(counter);
+                    } else {
+                        number.textContent = number.textContent.replace('href').replace(Math.floor(current));
+                    }
+                }, 16);
+            });
+            
+            stats.unobserve(entry.target);
         }
-    }, duration / 16)
+    });
+}, {threshold: 0.5});
+
+const statsSection = document.querySelector('.stats');
+if (statsSection) {
+    statsObserver.observe(statsSection);
 }
 
-const statNum = document.querySelectorAll(".stat-number")
+const sections = document.querySelectorAll("section[id]");
+const navLinks = document.querySelectorAll(".nav-links a");
 
-countUp(statNum[0], 1000, 0, 50)
-countUp(statNum[1], 99.9, 1, 50)
+function changeNavActive() {
+    let scrollY = window.scrollY + 100;
+
+    sections.forEach(current => {
+        const sectionHeight = current.offsetHeight;
+        const sectionTop = current.offsetTop;
+        const sectionId = current.getAttribute("id");
+
+        if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+            navLinks.forEach(a => {
+                a.classList.remove("active");
+                if (a.getAttribute("href") === `#${sectionId}`) {
+                    a.classList.add("active");
+                }
+            });
+        }
+    });
+}
+
+window.addEventListener("scroll", changeNavActive);
+changeNavActive();
