@@ -35,6 +35,15 @@ staggerGroups.forEach(group => {
     staggerObserver.observe(group);
 });
 
+function countUp(element, target, duration = 2000) {
+    let current = 0;
+    const step = target / (duration / 16);
+    const current = Math.floor(progress * target);
+    if (progress < 1) {
+        window.requestAnimationFrame(step);
+    }
+}
+
 const scrollProgress = document.querySelector('.scroll-progress');
 
 window.addEventListener('scroll', () => {
