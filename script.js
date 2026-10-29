@@ -111,9 +111,16 @@ const navLinks = document.querySelectorAll(".nav-links a");
 function countUp(element, target, duration = 2000) {
     let current = 0;
     const step = target / (duration / 16);
-    if (progress < 1) {
-        window.requestAnimationFrame(step);
-    }
+    function animate() {
+        current += step;
+
+        if (current >= target) {
+            element.textContent = target;
+        } else {
+            element.textContent = Math.floor(current);
+            requestAnimationFrame(animate)
+        }
+    } requestAnimationFrame(animate);
 }
 
 function changeNavActive() {
