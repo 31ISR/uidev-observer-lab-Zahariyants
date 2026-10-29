@@ -35,14 +35,6 @@ staggerGroups.forEach(group => {
     staggerObserver.observe(group);
 });
 
-function countUp(element, target, duration = 2000) {
-    let current = 0;
-    const step = target / (duration / 16);
-    if (progress < 1) {
-        window.requestAnimationFrame(step);
-    }
-}
-
 const scrollProgress = document.querySelector('.scroll-progress');
 
 window.addEventListener('scroll', () => {
@@ -115,6 +107,14 @@ if (statsSection) {
 
 const sections = document.querySelectorAll("section[id]");
 const navLinks = document.querySelectorAll(".nav-links a");
+
+function countUp(element, target, duration = 2000) {
+    let current = 0;
+    const step = target / (duration / 16);
+    if (progress < 1) {
+        window.requestAnimationFrame(step);
+    }
+}
 
 function changeNavActive() {
     let scrollY = window.scrollY + 100;
